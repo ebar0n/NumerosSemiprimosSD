@@ -20,5 +20,5 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
         except Exception as e:
             print("Exception wile receiving message: ", e)
 
-server = MyTCPServer(('127.0.0.1', 13373), MyTCPServerHandler)
+server = MyTCPServer(('0.0.0.0', 13373), MyTCPServerHandler)
 server.serve_forever()
