@@ -5,10 +5,7 @@ def ping(request):
     # print ("Send ping")
     # print (type(request))
     request.send(
-        bytes(
-            ' ',
-            'UTF-8'
-        )
+        ' '.encode('UTF-8')
     )
 
 def read_json(bufer, request):
@@ -35,10 +32,7 @@ def read_json(bufer, request):
 def send_json(bufer, request):
     # print ("Enviando {0}".format(bufer))
     request.sendall(
-        bytes(
-		  json.dumps( bufer ),
-		  'UTF-8'
-	   )
+        json.dumps( bufer ).encode('UTF-8')
     )
 
 def return_rangos_primos(numero, n):
@@ -109,7 +103,7 @@ def return_rangos_semiprimos(primos, limite, n):
     return rangos
 
 def calcular_semiprimos(semiprimos_json):
-    primos = semiprimos_json["primos"]
+    primos = semiprimos_json["primos_all"]
     ini = semiprimos_json["ini"]
     limite = semiprimos_json["limite"]
 
@@ -118,4 +112,4 @@ def calcular_semiprimos(semiprimos_json):
         for x in primos[primos.index(num):]:
             if num * x <= limite:
                 semiprimos.append(num * x)
-    print (semiprimos)
+    return semiprimos

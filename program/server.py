@@ -118,10 +118,11 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
                             )
                             print ('Rango de primos asignado: {0}'.format(self.rango))
 
-                            print ("Esperando resp")
+                            print ("Esperando semiprimos")
                             data, bufer = read_json(
                                 self.bufer, self.request
                             )
+                            print (data["semiprimos"])
                 time.sleep(2)
             
         except Exception as e:
@@ -129,9 +130,14 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
             pass
             
         if hasattr(self, "rango"):
-            if not self.rango["primos"]:
-                self.rango['asignado'] = False
-                print ("El rango: {0} sera reasignado".format(self.rango))
+            if 'primos' in self.rango:
+                if not self.rango["primos"]:
+                    self.rango['asignado'] = False
+                    print ("El rango: {0} sera reasignado".format(self.rango))
+            if 'semiprimos' in self.rango:
+                if not self.rango["semiprimos"]:
+                    self.rango['asignado'] = False
+                    print ("El rango: {0} sera reasignado".format(self.rango))
 
     def finish(self):
         self.display_coun_connections(-1)

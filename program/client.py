@@ -1,7 +1,7 @@
 import socket
 import json
 import sys
-from util import read_json, send_json, es_primo
+from util import read_json, send_json, es_primo, calcular_semiprimos
 import time
 
 if __name__ == '__main__':
@@ -39,5 +39,10 @@ if __name__ == '__main__':
 			if 'semiprimos' in data:
 				if not data["semiprimos"]:
 					print ('\nCalculando semiprimos')
+					data["semiprimos"] = calcular_semiprimos(data)
+					send_json(
+		                data,
+		                request
+		            )
 					time.sleep(2)
 		request.close()
