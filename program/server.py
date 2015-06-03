@@ -59,8 +59,10 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
                             )
                             print ('Rango de primos asignado: {0}'.format(self.rango))
                             break
+                    band = True
                     if hasattr(self, "rango"):
                         while True:
+                            print ("Esperando resp")
                             data, bufer = read_json(
                                 self.bufer, self.request
                             )
@@ -72,14 +74,27 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
 
                                 band = True
                                 for rango in json_primos:
-                                    if not rango['primos']:
-                                        band=False
+                                    if rango['primos']:
+                                        if rango["procesado"] is False:
+                                            json_semiprimos["primos"] += rango['primos']
+                                            rango["procesado"] = True
+                                    else:
+                                        band = False
 
-                                if band:
+                                if band is False:
                                     for rango in json_primos:
-                                        json_semiprimos["primos"] += rango['primos']
-
-                                break
+                                        if not rango['asignado']:
+                                            self.rango = rango
+                                            self.rango['asignado'] = True
+                                            
+                                            send_json(
+                                                self.rango,
+                                                self.request
+                                            )
+                                            print ('Rango de primos asignado: {0}'.format(self.rango))
+                                            break
+                                else:
+                                    break
                             time.sleep(2)
                     break
                 else:
@@ -87,10 +102,26 @@ class MyTCPServerHandler(socketserver.BaseRequestHandler):
                     time.sleep(2)
 
             # Repartir carga de semiprimos
-            # print ("\n\nCalcular semiprimos")
+            print ("\n\nCalcular semiprimos")
 
-
+            global json_semiprimos_rangos
             while True:
+                if json_semiprimos_rangos:
+                    for rango in json_semiprimos_rangos:
+                        if not rango['asignado']:
+                            self.rango = rango
+                            self.rango['asignado'] = True
+                            
+                            send_json(
+                                self.rango,
+                                self.request
+                            )
+                            print ('Rango de primos asignado: {0}'.format(self.rango))
+
+                            print ("Esperando resp")
+                            data, bufer = read_json(
+                                self.bufer, self.request
+                            )
                 time.sleep(2)
             
         except Exception as e:
@@ -136,19 +167,38 @@ if __name__ == '__main__':
             )
 
             while True:
-                if json_semiprimos["primos"]:
-                    json_semiprimos["primos"].sort()
-                    print ("\n\nPrimos calculados {0}".format(json_semiprimos["primos"]))
+                if coun_connections < 1:
+                    print ('\nEsperando clientes...')
+                    time.sleep(3)
+                else:
+                    break
 
-                    json_semiprimos_rangos = return_rangos_semiprimos(
-                        json_semiprimos["primos"],
-                        limite,
-                        coun_connections,
-                    )
-                    
-                    print ("Rangos para calcular semiprimos {0}".format(json_semiprimos_rangos))
+            while True:
+                if json_semiprimos["primos"]:
+
+                    band = True
+                    for rango in json_primos:
+                        if not rango['primos']:
+                            band = False
+
+                    if band:
+                        json_semiprimos["primos"].sort()
+                        print ("\nPrimos calculados {0}".format(json_semiprimos["primos"]))
+
+                        json_semiprimos_rangos = return_rangos_semiprimos(
+                            json_semiprimos["primos"],
+                            limite,
+                            coun_connections,
+                        )
+                        
+                        print ("\nRangos para calcular semiprimos {0}".format(json_semiprimos_rangos))
+                        break
                 time.sleep(3)
-            
+
+            print ("\nEsperando semiprimos:")
+            while True:
+                time.sleep(1)
+
     except KeyboardInterrupt:
         print ('Cierre todos los clientes conectado...')
         server.shutdown()

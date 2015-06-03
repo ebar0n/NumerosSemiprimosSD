@@ -20,23 +20,24 @@ if __name__ == '__main__':
 			)
 		)
 
-		data, bufer = read_json(bufer, request)
-		print (data)
-		if not data['primos']:
-			print ('\nCalculando primos')
-			for i in range(data['ini'], data['fin']):
-				if es_primo(i):
-					print ("primo encontrado: {0}".format(i))
-					data['primos'].append(i)
-			send_json(
-                data,
-                request
-            )
-			print ("Primos enviados :)")
-
+		while True:
 			data, bufer = read_json(bufer, request)
+			print (data)
+			if 'primos' in data:
+				if not data['primos']:
+					print ('\nCalculando primos')
+					for i in range(data['ini'], data['fin']):
+						if es_primo(i):
+							print ("primo encontrado: {0}".format(i))
+							data['primos'].append(i)
+					send_json(
+		                data,
+		                request
+		            )
+					print ("Primos enviados :)")
 
-		if not data["semiprimos"]:
-			print ('\nCalculando semiprimos')
-			time.sleep(2)
+			if 'semiprimos' in data:
+				if not data["semiprimos"]:
+					print ('\nCalculando semiprimos')
+					time.sleep(2)
 		request.close()

@@ -4,9 +4,9 @@ import time
 def ping(request):
     # print ("Send ping")
     # print (type(request))
-    request.sendall(
+    request.send(
         bytes(
-            '   ',
+            ' ',
             'UTF-8'
         )
     )
@@ -49,6 +49,7 @@ def return_rangos_primos(numero, n):
         json = {
             "asignado": False,
             "primos": [],
+            "procesado": False,
         }
         numero -= distancia
         if x == 0:
@@ -69,14 +70,18 @@ def return_rangos_primos(numero, n):
     return rangos
 	 
 def es_primo(num):
-   if num < 2:
-      return False
-   for i in range(2, num):
-      if num % i == 0:
-         return False
-      return True
+    cont = 0
+    for i in range(1, num + 1):
+        if num % i == 0:
+            cont += 1
+
+    if cont == 2:
+        return True
+    else:
+        return False
 
 def return_rangos_semiprimos(primos, limite, n):
+    primos_all = primos
     menor = primos[0]
     mayor = 0
     for x,num in enumerate(primos[1:]):
@@ -91,6 +96,10 @@ def return_rangos_semiprimos(primos, limite, n):
     for x in range(0,n):
         json = {}
         json["ini"] = primos[::salto]
+        json["primos_all"] = primos_all
+        json["semiprimos"] = []
+        json["limite"] = limite
+        json["asignado"] = False
         
         for num in primos[::salto]:
             primos.remove(num)
@@ -99,7 +108,11 @@ def return_rangos_semiprimos(primos, limite, n):
         rangos.append(json)
     return rangos
 
-def calcular_semiprimos(primos, ini, limite):
+def calcular_semiprimos(semiprimos_json):
+    primos = semiprimos_json["primos"]
+    ini = semiprimos_json["ini"]
+    limite = semiprimos_json["limite"]
+
     semiprimos = []
     for num in ini:
         for x in primos[primos.index(num):]:
